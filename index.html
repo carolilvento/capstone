@@ -11,28 +11,45 @@
 
 </head>
 
+<header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Contaminated Facilities </a></li>
+      <li><a href="income.html">Income Data</a></li>
+      <li><a href="area.html">Affected Areas</a></li>
+    </ul>
+  </nav>
+</header>
+
 <body>
   <h1>PFAS Contamination in Florida Drinking Water</h1>
 
   <p>An approximate location of all the Florida drinking water systems that have tested above maximum levels of PFAS.</p>
 
+  <div id="container"></div>
+
+  <div id="info"></div>
+
   <div id="map"></div>
 
   <p>By Carolina Ilvento</p>
 
-  <p>
-      <a href="income.html">Income Data</a>
-    </p>
-
-    <p>
-        <a href="area.html">Affected Areas</a> 
-      </p>
 
 <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js" integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg=" crossorigin=""></script>
 
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/themes/grid-light.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/dumbbell.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="js/places.js"></script>
+<!-- <script src="js/OcalaData.js"></script>
+<script src="js/ocalamap.js"></script> -->
 
 <script>
+
+// CREATE MAP
   var map = L.map('map').setView([28.256686, -83.716843], 6.33);
 
   L.tileLayer('https://api.mapbox.com/styles/v1/carolilvento/cle6mqs99009k01qgr8y5ugwv/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiY2Fyb2xpbHZlbnRvIiwiYSI6ImNsZTV3dmtvcDAwOHUzcWxlOHNhZThybDIifQ.JpySVKFAYhvuRRULnwC1hQ', {
@@ -40,13 +57,98 @@
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
 }).addTo(map);
 
+  // ADD MARKER WITH POP UP INFO
   for ( let i = 0; i < places.length; i++ ) {
-    L.marker( [ places[i].Latitude, places[i].Longitude ] )
+    var marker = L.marker( [ places[i].Latitude, places[i].Longitude ] )
     .bindPopup('<h3>' + places[i].SystemName + '</h3>' + '<p>' + 'Serves ' + places[i].PopServed + ' people' + '</p>')
-    .addTo(map)
+    .addTo(map);
+
+    marker.on('click', function() {
+      updateInfoBox(places[i].SystemName, places[i].PopServed);
+      // CREATE INFO BOX THAT SHOWS UP ON CLICK
+      function updateInfoBox(systemName, popServed) {
+        var infoBox = document.getElementById('info');
+        info.innerHTML = " <p> You are being served by " + systemName + '.' + ' This facility has xxxx levels of PFAS </p>' ;
+      }
+      var container = document.getElementById('container');
+      Highcharts.chart('container', {
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: 'PFAS Levels in Ocala'
+      },
+      subtitle: {
+        text: 'Source: City of Ocala'
+      },
+      xAxis: {
+        categories: [
+          '2019',
+          '2020',
+          '2021',
+          '2022'
+        ],
+        crosshair: true
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'PFAS Compound Results (ng/l)'
+        }
+      },
+      tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+          '<td style="padding:0"><b>{point.y:.1f} ppt</b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+      },
+      plotOptions: {
+        column: {
+          pointPadding: 0.2,
+          borderWidth: 0
+        }
+      },
+      series: [{
+        name: 'PFHxS',
+        data: [29, 39, 30,49]
+
+      }, {
+        name: 'PFOS',
+        data: [34, 37, 32, 45]
+
+      }, {
+        name: 'PFOA',
+        data: [4.5, 4.3, 5.1, 6.3]
+
+      }, {
+        name: 'PFHxA',
+        data: [11, 10, 13, null]
+
+      }]
+      });
+    });
+
   }
 
 </script>
+
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+
+       <!-- change the Highcharts theme -->
+       <script src="https://code.highcharts.com/themes/grid-light.js"></script>
+
+       <!-- add Highcharts print and export features - optional -->
+       <script src="https://code.highcharts.com/modules/exporting.js"></script>
+       <script src="https://code.highcharts.com/highcharts-more.js"></script>
+       <script src="https://code.highcharts.com/modules/dumbbell.js"></script>
+       <script src="https://code.highcharts.com/modules/export-data.js"></script>
+       <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+       <!-- add file for your own JavaScript code - this creates the chart -
+            note, it is in the scripts/ folder  -->
+       <!-- <script src="js/ocalamap.js"></script> -->
 
 </body>
 </html>
